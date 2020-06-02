@@ -1,0 +1,19 @@
+#include <stdio.h>
+#include <string.h>
+#include<iostream>
+using namespace std;
+int main()
+{
+unsigned a = 999 , b = 999 , c = 0 , f = 0 ;
+char s[100] ;
+
+while( a )
+{
+sprintf( s , "%d   " , c = a * b ) ;
+if( s[0] == s[5] && s[1] == s[4] && s[2] == s[3] && s[6] == ' ' && c > f )
+f = c ;
+if( --b  == 99)
+--a , b = 999 ;
+}
+std::cout << f << std::endl ;
+}
