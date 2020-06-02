@@ -1,0 +1,17 @@
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    unsigned long long int max;
+    register unsigned long long int i=2, num=600851475143;
+    for (i; i<=num; i++)
+    {
+        if (num%i==0)
+        {
+            num=num/i;
+            max=i;
+        }
+    }
+    printf("%llu", max);
+    return 0;
+}
