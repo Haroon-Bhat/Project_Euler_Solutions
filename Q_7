@@ -1,0 +1,31 @@
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    register unsigned int flag=0, count=2; //for int i=2 and i=3
+    register unsigned int i=4;
+    unsigned int ans;
+    while (count!=10001)
+    {
+        for (unsigned long long int j=2; j<=i/2; j++)
+        {
+            if (i%j==0)
+            {
+                flag=0;
+                break;
+            }
+            else
+            {
+                flag=1;
+            }
+        }
+        if (flag==1)
+        {
+            count+=1;
+        }
+        ans=i;
+        i++;
+    }
+    printf("%u", ans);
+    return 0;
+}
