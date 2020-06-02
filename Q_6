@@ -1,0 +1,19 @@
+#include <iostream>
+using namespace std;
+int main()
+{
+const int limit = 100;
+            int sumsq = 0;
+            int sqsum = 0;
+           
+            for(int i = 1; i <= limit; i++)
+            {
+                sumsq += (i*i);
+                sqsum += i;
+            }
+            
+            sqsum *= sqsum;
+            int diff = sqsum - sumsq;
+            cout<<diff;
+return 0;
+}
