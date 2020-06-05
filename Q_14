@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+main()
+{
+	unsigned long current_number;
+	int temp, highest_chain_number, highest_chain, current_chain;
+	highest_chain = 0;
+
+	for(current_number = 1; current_number <= 1000000; current_number++)
+	{
+		temp = current_number;
+		current_chain = 1;
+
+
+		while(current_number != 1)
+		{
+			if(current_number % 2 == 0)
+			{
+				current_number /= 2;
+				++current_chain;
+			}
+			else
+			{
+				current_number = 3*current_number + 1;
+				++current_chain;
+			}
+		}
+
+		if(current_chain > highest_chain)
+		{
+			highest_chain = current_chain;
+			highest_chain_number = temp;
+		}
+
+		current_number = temp;
+	}
+
+	printf("Longest chain: %d, Number: %d", highest_chain, highest_chain_number);
+}
