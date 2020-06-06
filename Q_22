@@ -1,0 +1,32 @@
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <string>
+
+// #include <other includes for reading files>
+
+using namespace std;
+using NamesList = vector<string>;
+
+// These are implemented to load and parse the "names.txt" file,
+// but they just make this post longer so I decided to cut them off
+string load_file( string filename ) { /* ... */ }
+NamesList parse( string filename ) { /* ... */ }
+
+constexpr int letter_score( const char& c ) { return c-'A'+1; }
+
+int word_score( const string& s ) {
+	int score = 0;
+	for ( const auto& c : s )
+		score += letter_score(c);
+	return score;
+}
+
+int main() {
+	auto list = parse("https://projecteuler.net/project/resources/p022_names.txt");
+	std::sort( list.begin(), list.end() );
+	int score = 0;
+	for ( int i = 0; i < list.size(); i++ )
+		score += word_score(list[i])*(i+1);
+	std::cout << score << std::endl;
+}
