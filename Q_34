@@ -1,0 +1,32 @@
+#include <stdio.h>
+using namespace std;
+
+long factorial[10] = { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+
+long GetSumDigitFactorials( long n )
+{
+  long result = 0;
+  int digit;
+
+  while ( n > 0 ) {
+    digit = n % 10;
+    result += factorial[digit];
+    n /= 10;
+  }
+  return result;
+}
+
+
+int main()
+{
+  long sum = 0;
+  long n;
+
+  for ( n = 3; n <= 2540160; ++n ) {
+    if ( n == GetSumDigitFactorials(n) ) {
+      sum += n;
+      printf( "%8ld   Sum: %ld\n", n, sum );
+    }
+  }
+  return 0;
+}
