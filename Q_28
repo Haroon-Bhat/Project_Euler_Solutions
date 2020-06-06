@@ -1,0 +1,63 @@
+
+#include <iostream>
+
+using namespace std;
+
+typedef unsigned long long int MyLong;
+MyLong spiral[1001][1001];
+
+void initSpiral();
+void extend(int,int);
+
+MyLong sumSpiral();
+int posx = 501, posy=500;
+MyLong currentNumber = 2;
+
+int
+main()
+{
+    initSpiral();
+    extend(1,0);
+    while (posx < 1001)
+    {
+        extend(0,1);
+        extend(-1,0);
+        extend(0,-1);
+        extend(1,0);
+    }
+
+    cout << "Solution:" << sumSpiral() << endl;
+}
+
+void initSpiral()
+{
+    for (int i = 0; i < 1001; i++)
+        for (int j = 0; j < 1001; j++)
+            spiral[i][j]=0;
+
+    spiral[500][500] = 1;
+}
+
+void extend (int diffx, int diffy)
+{
+    while (spiral[posx-diffy][posy+diffx] != 0 & posx < 1001)
+    {
+        spiral[posx][posy] = currentNumber;
+        posx += diffx; posy += diffy;; currentNumber++;
+    }
+    spiral[posx][posy] = currentNumber;
+}
+
+MyLong
+sumSpiral()
+{
+    MyLong sum = 0;
+    for (int i=0; i < 1001; i++)
+    {
+        if (i != 500)
+            sum = sum + spiral[i][i] + spiral[1000-i][i];
+        else
+            sum += spiral[i][i];
+    }
+    return sum;
+}
