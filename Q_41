@@ -1,0 +1,69 @@
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+bool contains (int number, int digit);
+bool isNPandigital (int candidatePrime, int N);
+bool isPrime (int candidatePrime);
+
+int main()
+{
+    unsigned int number;
+
+    // a 7-digited pandigital prime is as high as it gets
+    for (number = 7654321; number > 7123456; number -= 2)
+        {
+            if ( (isNPandigital(number, 7))
+              && (isPrime(number)))
+            {
+                cout << number << endl;
+                return 0;
+            }
+        }
+
+    // a 4-digited pandigital prime is the only alternative
+    for (number = 4321; number >= 4123; number -= 2)
+        {
+            if ( (isNPandigital(number, 4))
+              && (isPrime(number)))
+            {
+                cout << number << endl;
+                return 0;
+            }
+        }
+
+}
+
+bool isPrime (int candidatePrime)
+{
+    if (candidatePrime == 1) return false;
+    if (candidatePrime == 2) return true;
+    if ((candidatePrime % 2) == 0) return false;
+    for (int i = 3; i * i <= candidatePrime; i += 2)
+    {
+        if ((candidatePrime / i) * i == candidatePrime) return false;
+    }
+    return true;
+}
+
+bool isNPandigital (int candidatePandigital, int N)
+{
+    for (int z(1); z <= N; ++z)
+        if (!(contains(candidatePandigital, z)))
+            return false;
+    return true;
+}
+
+bool contains (int number, int digit)
+{
+    for(;;)
+    {
+        if (number == 0)
+            return false;
+        else if ((number % 10) == digit)
+            return true;
+        else
+            number /= 10;
+    }
+}
