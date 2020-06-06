@@ -1,0 +1,92 @@
+
+#include <iostream>
+#include <ctime>
+using std::cout;
+using std::endl;
+
+unsigned long long int nextpano(unsigned long long int n)
+{
+	char digs[10];
+	int h=0;
+	while(n>0)
+	{
+		digs[h] = (int)(n%10);
+		n/=10;
+		h++;
+	}
+	int temp;
+	for(int i=1; i<10; i++)
+	{
+		if (digs[i] < digs[i-1])
+		{
+			int pi=0;
+			int pl=10;
+			for(int j=0; j<i; j++)
+			{
+				if (digs[j] < pl && digs[j] > digs[i])
+				{
+					pl = digs[j];
+					pi = j;
+				}
+			}
+			temp = digs[i];
+			digs[i] = digs[pi];
+			digs[pi] = temp;
+			for(int k=i; k>0; k--)
+			{
+				for(int j=1; j<k; j++)
+				{
+					if  (digs[j] > digs[j-1])
+					{
+						temp = digs[j];
+						digs[j] = digs[j-1];
+						digs[j-1] = temp;
+					}
+				}
+			}
+			break;
+		}
+	}
+	unsigned long long int r=0;
+	for(int i=9; i>=0; i--)
+	{
+		r*=10;
+		r+=digs[i];
+	}
+	return r;
+}
+
+int main()
+{
+	unsigned long long int n = 1023456789;
+	unsigned long long int s = 0;
+	unsigned long long int t;
+	clock_t kakka;
+	kakka = clock();
+	for(n=1023456789; n<9876543210; n=nextpano(n))
+	{
+		if ((n%1000)%17 != 0)
+			continue;
+		t=n/10;
+		if ((t%1000)%13 != 0)
+			continue;
+		t/=10;
+		if ((t%1000)%11 != 0)
+			continue;
+		t/=10;
+		if ((t%1000)%7 != 0)
+			continue;
+		t/=10;
+		if (t%5 != 0)
+			continue;
+		t/=10;
+		if ((t%1000)%3 != 0)
+			continue;
+		t/=10;
+		if (t%2 != 0)
+			continue;
+		s+=n;
+	}
+	kakka = clock() - kakka;
+	cout << kakka << "ms elapsed." << endl << s << endl;
+}
