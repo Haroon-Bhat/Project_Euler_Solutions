@@ -1,0 +1,31 @@
+
+#include <iostream>
+
+using namespace std;
+
+int gcd( int a, int b )
+{
+  return b == 0 ? a : gcd( b, a % b );
+}
+
+int main()
+{
+  int num = 1, den = 1;
+  for ( int a = 1; a <= 9; a++ )
+    for ( int b = 1; b <= 9; b++ )
+      for ( int c = 1; c <= 9; c++ ) {
+        int n1 = 10 * c + a, n2 = 10 * a + c;
+        int d1 = 10 * c + b, d2 = 10 * b + c;
+        // n1/n1 and n2/n2 are not posible
+        if ( n1 < d2 && n1 * b == d2 * a ) {
+          num *= n1;
+          den *= d2;
+        }
+        if ( n2 < d1 && n2 * b == d1 * a ) {
+          num *= n2;
+          den *= d1;
+        }
+      }
+
+  cout << "Denominator = " << den / gcd( num, den ) << endl;
+}
