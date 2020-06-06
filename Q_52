@@ -1,0 +1,30 @@
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+
+int primes[]={2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
+int hash1(int x)
+{
+	int r;
+	for ( r=1 ; x ; x /= 10)
+		r *= primes[x%10];
+	return r;
+}
+int main()
+{
+	int x,h;
+	for (x=1;;x++)
+	{
+		h = hash1(x);
+		if ( h == hash1(2*x)
+		&&	 h == hash1(3*x)
+		&&	 h == hash1(4*x)
+		&&	 h == hash1(5*x) 
+		&&	 h == hash1(6*x)
+			)
+			break;
+	}
+	printf("%d %d %d %d %d %d\n",x,2*x,3*x,4*x,5*x,6*x);
+}
