@@ -1,0 +1,44 @@
+#include <iostream>
+#include <vector>
+
+unsigned rotate(unsigned n)
+{
+	unsigned l = 10;
+	while(n / l) l *= 10;
+	return (n+(n%10)*l)/10;
+}
+
+// P35: find the number of circular primes below one million
+int main()
+{
+	//std::cout << rotate(2);
+
+	unsigned const n = 1000000;
+	std::vector<bool> p(n, true);
+	
+	// sieve of Eratosthenes
+	for(unsigned i = 2; i*i <= n; ++i)
+		for(unsigned j = 2*i; j < n; j += i)
+			p[j] = false;
+			
+	// find number of circular primes
+	unsigned num = 0;
+	for(unsigned i = 2; i != n; ++i)
+		if(p[i])
+		{
+			bool circular = true;
+			unsigned j = i;
+			while((j = rotate(j)) != i)
+			{
+			//	std::cout << j << " ";
+				if(!p[j] || j % 10 == 0)
+				{
+					circular = false;
+					break;
+				}
+			}
+			if(circular) ++num;
+		}
+		
+	std::cout << "num: " << num; // answer: 55
+}
