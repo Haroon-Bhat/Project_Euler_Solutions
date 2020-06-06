@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <assert.h>
+
+#define TRINUM 51
+
+int main(int argc, char *argv[])
+{
+    int *triangles, ch, start = 0, i, sum = 0, total = 0;
+    FILE *fp;
+    
+    assert(triangles = malloc(TRINUM*sizeof(int)));
+    
+    for (i = 1; i <= TRINUM; i++)
+        triangles[i - 1] = (i*(i + 1))/2;
+    
+    if ((fp = fopen("words.txt", "r")) == NULL)
+    {
+        printf("Couldn't open the file");
+        free(triangles);
+        return 0;
+    }
+    
+    while((ch = fgetc(fp)) != EOF)
+    {           
+        if (ch == 34) // 34 == (int) "
+        {
+            start = !start;
+            ch = fgetc(fp);
+            
+            if (!start)
+            {
+                for (i = 0; sum >= triangles[i]; i++)
+                {
+                    if (sum == triangles[i])
+                       total++;
+                }      
+            }
+            sum = 0;
+        }
+        
+        if (start)
+            sum += (ch - 64);   
+    }
+    
+    printf("There are %d triangle words in the list", total);
+    fclose(fp);
+    free(triangles);
+    return 0;
+}
