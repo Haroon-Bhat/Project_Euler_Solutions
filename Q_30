@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <string.h>
+
+int powi(int i, int j);
+
+int main(void)
+{
+    int a = 0, b = 0, c = 0, d = 0, e = 0, f = 0;
+    int x, y = 0, z = 0;
+    char buf[8];
+
+    for(x = 2 ; x <= 999999 ; x++)
+    {
+        memset(buf, 0, sizeof(buf));
+        sprintf(buf, "%d", x);
+
+        if(buf[0]) a = buf[0] - 48; else a = 0;
+        if(buf[1]) b = buf[1] - 48; else b = 0;
+        if(buf[2]) c = buf[2] - 48; else c = 0;
+        if(buf[3]) d = buf[3] - 48; else d = 0;
+        if(buf[4]) e = buf[4] - 48; else e = 0;
+        if(buf[5]) f = buf[5] - 48; else f = 0;
+
+        z = 0;
+    
+        if(a) z += powi(a,5);
+        if(b) z += powi(b,5);
+        if(c) z += powi(c,5);
+        if(d) z += powi(d,5);
+        if(e) z += powi(e,5);
+        if(f) z += powi(f,5);
+
+        if(z == x)
+        {
+            printf("%d\n", x);
+            y += x;
+        }
+    }
+
+    printf("\nAnswer = %d\n\n", y);
+
+    return 0;
+}
+
+int powi(int i, int j)
+{ 
+    int x;
+    int r = i;
+
+    if(j == 0)
+    {
+        r = 1;
+    }
+    else
+    {
+        for(x = 1 ; x < j ; x++)
+        {
+            r *= i;
+        }
+    }
+    return r;
+}
