@@ -1,0 +1,20 @@
+#include <iostream> 
+#define N 1000 
+#define Q 10000000000ULL 
+using namespace std;
+ int main(void) 
+{ unsigned long long dig = 0;
+ unsigned i; 
+for (i = 1; i < N; i++)
+ { 
+unsigned long long r = 1;
+ unsigned j; 
+for (j = 0; j < i; j++) 
+{ 
+r = (r * i) % Q; 
+} 
+dig = (dig + r) % Q; 
+} 
+cout<<dig; 
+return 0;
+ }
