@@ -1,0 +1,40 @@
+
+#include <stdio.h>
+int main() {
+  int list[1001];
+  int m,n;
+  int a,b,c;
+  int p;
+  int max=0;
+  int maxp;
+  int i;
+  int j,k;
+  for(i=0;i<=1000;i++)
+    list[i]=0;
+  for(j=1;j<=1000;j++) {
+    for(k=1;k<=1000;k++) {
+      if(j%2) {
+	a=j*(2*k+1);
+	b=2*j*k*(k+1);
+	c=j*(2*k*(k+1)+1);
+      }
+      else {
+	a=(j/2)*2*k;
+	b=(j/2)*(k*k-1);
+	c=(j/2)*(k*k+1);
+      }
+      p=a+b+c;
+      if(p<=1000 && p>0) {
+//	printf("%d\n",p);
+	list[p]++;
+      }
+    }
+  }
+  for(i=0;i<=1000;i++) {
+    if(list[i]>max) {
+      max=list[i];
+      maxp=i;
+    }
+  }
+  printf("%d\n",maxp);
+}
