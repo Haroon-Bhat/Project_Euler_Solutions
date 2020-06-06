@@ -1,0 +1,34 @@
+#include <set>
+#include <iostream>
+
+using namespace std;
+
+
+unsigned int delta = 0xFFFFFFFF;
+set<int> pentas;
+
+int main()
+{
+    int i;
+    for (i=1; i<10000; ++i)
+    {
+        pentas.insert((i*(3*i-1))/2);
+    }
+    for(set<int>::iterator aIter = pentas.begin(); aIter != pentas.end(); ++aIter)
+    {
+        for(set<int>::iterator aIter2 = pentas.begin(); aIter2 != pentas.end(); ++aIter2)
+        {
+            int i = *aIter;
+            int j = *aIter2;
+            if(j <= i) continue;
+            // now, j > i
+            if (pentas.find(i+j) == pentas.end()) continue;
+            if (pentas.find(j-i) == pentas.end()) continue;
+            if (delta > (j-i))
+            {
+                delta = (j-i);
+            }
+        }
+    }
+    cout << "Min delta = " << delta << endl;
+}
