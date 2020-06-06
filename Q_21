@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+long long unsigned int rez = 1;
+
+static inline int proces_magic(int i) {
+
+	int j,k,l = 1;
+
+	for (j = i / 2, k = 0 ; j > 1; j--) 
+		if (! (i % j))
+			l += j;
+	return l;
+}
+
+int
+main() {
+
+	int i,st ;
+	for (i = 2 ; i < 10000; i++) {
+		st = proces_magic(i);
+		if (i == proces_magic(st) && i != st )
+			rez += st + i;
+	}
+	return printf("%llu\n" , rez / 2);
+}
