@@ -1,0 +1,158 @@
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <fstream>
+using namespace std;
+
+pair<int, int> handRank(vector<pair<int, string> > &cards) {
+
+    sort(cards.begin(), cards.end());
+
+    pair<int, int> value = make_pair(0, cards[cards.size()-1].first);
+    bool Flush = true, Straight = true, OK = true, Two = false, Three = false;
+
+    string color = cards[0].second;
+    for (int i = 1; i < cards.size(); i++)
+        if (cards[i].second != color) {
+            Flush = false;
+            break;
+        }
+
+    if (Flush) {
+        OK = true;
+        for (int i = 0, j = 10; i < cards.size(); i++, j++)
+            if (cards[i].first != j) {
+                OK = false;
+                break;
+            }
+
+        if (OK) {
+            value.first = 9;
+            return value;
+        }
+    }
+
+    for (int i = 0; i < cards.size()-1; i++)
+        if (cards[i].first+1 != cards[i+1].first) {
+            Straight = false;
+            break;
+        }
+
+    if (Straight && Flush) {
+        value.first = 8;
+        return value;
+    }
+
+    if ((cards[0].first == cards[1].first && cards[0].first == cards[2].first && cards[0].first == cards[3].first) ||
+        (cards[1].first == cards[2].first && cards[1].first == cards[3].first && cards[1].first == cards[4].first)) {
+        value.first = 7;
+        value.second = cards[2].first;
+        return value;
+    }
+
+    int a = -1;
+    for (int i = 0; i < cards.size()-1; i++)
+        if (cards[i].first == cards[i+1].first) {
+            a = i;
+            value.first = 1;
+            value.second = cards[i].first;
+            break;
+        }
+
+    if (a != -1)
+        for (int i = 0; i < cards.size()-1; i++) {
+            if (i == a || i == a+1) continue;
+            if (cards[i].first == cards[i+1].first) {
+                value.first++;
+                value.second = cards[i].first;
+                Two = true;
+                break;
+            }
+        }
+
+    int bg;
+    for (int i = 0; i < cards.size()-2; i++) {
+
+        if (cards[i].first == cards[i+1].first && cards[i].first == cards[i+2].first) {
+            value.first = 3;
+            bg = value.second = cards[i].first;
+            Three = true;
+            break;
+        }
+    }
+
+    if (Two && Three) {
+        value.first = 6;
+        value.second = bg;
+        return value;
+    }
+
+    if (Flush) {
+        value.first = 5;
+        return value;
+    }
+
+    if (Straight) {
+        value.first = 4;
+        return value;
+    }
+
+    return value;
+}
+
+pair<int, string> parseValue(string line) {
+
+    pair<int, string> res;
+    string v = line.substr(0, 1);
+    if (v <= "9") res.first = stoi(v);
+    else if (v == "T") res.first = 10;
+    else if (v == "J") res.first = 11;
+    else if (v == "Q") res.first = 12;
+    else if (v == "K") res.first = 13;
+    else if (v == "A") res.first = 14;
+    res.second = line.substr(1, 1);
+    return res;
+}
+
+int whoWin(string &line) {
+
+    vector<pair<int, string> > c1(5), c2(5);
+    for (int i = 0, j = 0; i < line.size(); i += 3) {
+        if (j < 5) c1[j] = parseValue(line.substr(i, 2));
+        else c2[j-5] = parseValue(line.substr(i, 2));
+        j++;
+    }
+
+    pair<int, int> r1 = handRank(c1);
+    pair<int, int> r2 = handRank(c2);
+
+    if (r1.first > r2.first) return 1;
+    else if (r1.first < r2.first) return 2;
+
+    if (r1.second > r2.second) return 1;
+    else if (r1.second < r2.second) return 2;
+
+    for (int i = 4; i >= 0; i--) {
+        if (c1[i].first > c2[i].first) return 1;
+        else if (c1[i].first < c2[i].first) return 2;
+    }
+
+    return 0;
+}
+
+int main() {
+
+    int res = 0;
+    string line = "";
+    fstream file;
+    file.open("poker.txt");
+    while (!file.eof()) {
+        getline(file, line);
+        if (whoWin(line) == 1) res++;
+    }
+    file.close();
+    cout << res << endl;
+
+    return 0;
+}
