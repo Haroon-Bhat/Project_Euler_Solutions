@@ -1,0 +1,23 @@
+#include <iostream>
+#include <iomanip>
+#include <gmpxx.h>
+
+int main ()
+{
+    mpz_class n (1393), d (985), powerten (1000);
+    int sn = 7, count = 0;
+    do
+    {
+	do
+	{
+	    if (n >= powerten)
+		++count;
+	    mpz_class old_d (d);
+	    d = n + d;
+	    n = d + old_d;
+	} while (++sn < 1000 && d < powerten);
+	powerten *= 10;
+    } while (sn < 1000);
+    std::cout << "Answer: " << count << std::endl;
+    return 0;
+}
