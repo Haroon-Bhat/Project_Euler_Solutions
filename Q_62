@@ -1,0 +1,41 @@
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+#include<bits/stdc++.h>
+
+using namespace std;
+
+struct cube_info {
+  unsigned long min;
+  int count;
+};
+
+string cube2str( unsigned long n )
+{
+  ostringstream os;
+  os << n * n * n;
+  string s = os.str();
+  sort( s.begin(), s.end() );
+  return s;
+}
+
+int main()
+{
+  map< string, cube_info > cb;
+  string s;
+  int k = 0;
+  unsigned long n = 0;
+  do {
+    n++;
+    s = cube2str( n );
+    if ( cb.count( s ) == 0 ) {
+      cube_info ci = { n * n * n, 1 };
+      cb[ s ] = ci;
+    }
+    else
+      k = ++cb[ s ].count;
+  } while ( k != 5 );
+
+  cout << "Cube = " << cb[ s ].min << endl;
+}
