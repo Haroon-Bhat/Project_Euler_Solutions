@@ -1,0 +1,16 @@
+#include<stdio.h>
+#include<math.h>
+long double lower,power,count,a=1,b=9;
+int digit,flag;
+int main(){
+  for(digit=1;;digit++){
+    power=a/digit;
+    lower=pow10l(digit-1);
+    if(powl(b,digit)<lower) break;
+    lower=ceill(powl(lower,power));
+    count+=(b-lower+1);
+    }
+  printf("%.0Lf\n",count);
+  
+    return 0;
+}
