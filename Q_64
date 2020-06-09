@@ -1,0 +1,30 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+int period( int d )
+{
+  int l = 0;
+  double d2 = sqrtl( d );
+  int a = d2, p = 0, q = 1;
+  do {
+    l++;
+    p = a * q - p;
+    q = ( d - p * p ) / q;
+    a = ( p + d2 ) /q;
+  } while ( q != 1 );
+  return l;
+}
+
+int main()
+{
+  int odds = 0;
+  for ( int n = 2; n <= 10000; n++ ) {
+    int n2 = sqrt( n );
+    if ( n2 * n2 != n )
+      if ( period( n ) % 2 != 0 )
+        odds++;
+  }
+  cout << "Odd periods = " << odds << endl;
+}
