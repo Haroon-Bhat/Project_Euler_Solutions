@@ -1,0 +1,178 @@
+#include <iostream>
+#include <iomanip>
+#include <utility>
+#include <set>
+#include <map>
+#include <deque>
+#include <cmath>
+
+bool is_triangular (int num)
+{
+    // n**2 + n - 2P = 0
+    double disc = sqrt (1.0 + 8.0 * num);
+    return disc == (double) (int) disc && ((int) disc & 1);
+}
+
+bool is_square (int num)
+{
+    // n**2 - P = 0
+    double disc = sqrt (num);
+    return disc == (double) (int) disc;
+}
+
+bool is_pentagonal (int num)
+{
+    // 3n**2 - n - 2P = 0 
+    double disc = sqrt (1.0 + 24.0 * num);
+    return disc == (double) (int) disc && (int) disc % 6 == 5;
+}
+
+bool is_hexagonal (int num)
+{
+    // 2n**2 - n - P = 0
+    double disc = sqrt (1.0 + 8.0 * num);
+    return disc == (double) (int) disc && ((int) disc & 3) == 3;
+}
+
+bool is_heptagonal (int num)
+{
+    // 5n**2 - 3n - 2P = 0
+    double disc = sqrt (9.0 + 40.0 * num);
+    return disc == (double) (int) disc && (int) disc % 10 == 7;
+}
+
+bool is_octagonal (int num)
+{
+    // 3n**2 - 2n - P = 0
+    double disc = sqrt (1.0 + 3.0 * num);
+    return disc == (double) (int) disc && (int) disc % 3 == 2;
+}
+
+// The STL type hierarchy is a pain.
+typedef bool (*Predicate) (int);
+typedef std::multimap<int, int> NumMap;
+typedef NumMap::const_iterator NumMapIter;
+typedef std::pair<NumMapIter, NumMapIter> NumBounds;
+typedef std::pair<int, int> NumPair;
+typedef std::set<NumPair> NumSet;
+typedef std::deque<NumMap> NumMapList;
+typedef std::deque<NumSet> NumSetList;
+typedef std::deque<int> NumList;
+typedef std::deque<bool> BoolList;
+
+// Generate a map and a set of two digit numbers ab->cd such that abcd
+// satisfies the predicate. Used with the is_*() functions above to generate
+// maps of triangular, square, pentagonal, hexagonal and octagonal numbers.
+void prep_num_map (NumMap &num_map, NumSet &num_set, const Predicate pred)
+{
+    for (int i = 10; i < 99; ++i)
+	for (int j = i + 1; j < 100; ++j)
+	{
+	    if (pred (i * 100 + j))
+	    {
+		std::pair<int, int> p (i, j);
+		num_map.insert (p);
+		num_set.insert (p);
+	    }
+	    if (pred (j * 100 + i))
+	    {
+		std::pair<int, int> p (j, i);
+		num_map.insert (p);
+		num_set.insert (p);
+	    }
+	}
+}
+
+// Recurses on itself looping over the contents of the deque cycle, which
+// represents the two-digit numbers comprising the cyclical numbers through
+// concatenation of adjacent elements (so {ab, cd, ef, gh, ij, kl} would
+// represent abcd, cdef, efgh, ghij, ijkl and klab, each of which exhibits
+// a different figurative property.
+bool find_cycle (NumList &cycle, const int step, BoolList &sat,
+		 const NumMapList &maps, const NumSetList &sets,
+		 const Predicate preds [])
+{
+    if (!step)
+    {
+	// Base case. Find the property that none of the predecessors exhibit
+	// and see if klab (comprised of kl and ab) exhibits it. If so, we've
+	// found the target cycle.
+	BoolList::reverse_iterator i;
+	NumSetList::const_reverse_iterator s;
+	for (i = sat.rbegin (), s = sets.rbegin (); i != sat.rend (); ++i, ++s)
+	    if (!*i)
+	    {
+		if (s->count (std::make_pair (cycle [5], cycle [0])))
+		    return true;
+		break;
+	    }
+    }
+    else
+    {
+	// General case.
+	NumMapList::const_reverse_iterator m;
+	BoolList::reverse_iterator s;
+	for (m = maps.rbegin (), s = sat.rbegin (); m != maps.rend (); ++m, ++s)
+	{
+	    if (!*s) // If the current figurate property is not exhibited:
+	    {
+		*s = true;
+		// iterate over two-digit numbers that appropriately
+		// "complete" four-digit numbers that exhibit the appropriate
+		// property, with the first two digits taken from the previous
+		// recursion.
+		NumBounds bounds = m->equal_range (cycle [5 - step]);
+		for (NumMapIter i = bounds.first; i != bounds.second; ++i)
+		{
+		    // Set next step's two digits and recurse
+		    cycle [6 - step] = i->second;
+		    if (find_cycle (cycle, step - 1, sat, maps, sets, preds))
+			return true;
+		}
+		*s = false;
+	    }
+	}
+    }
+    return false;
+}		 
+
+int main ()
+{
+    NumMapList maps (8 - 3 + 1);
+    NumSetList sets (8 - 3 + 1);
+
+    const Predicate preds [] =
+    {
+	&is_triangular, &is_square, &is_pentagonal, &is_hexagonal,
+	&is_heptagonal, &is_octagonal
+    };
+
+    // Initialize figurate property maps and sets.
+    for (size_t i = 0; i < sizeof (preds) / sizeof (preds [0]); ++i)
+	prep_num_map (maps [i], sets [i], preds [i]);
+    
+    // This keeps track of the figurate properties satisfied during recursion.
+    const bool sat_init [] = { false, false, false, false, false, false };
+    BoolList sat (sat_init, sat_init + sizeof (sat_init) / sizeof (*sat_init));
+    
+    NumList cycle (6); // Holds component two-digit numbers
+    
+    // For each figurate property . . .
+    for (NumMapList::const_reverse_iterator i = maps.rbegin (); i != maps.rend (); ++i)
+    {
+	// iterate over the first two digits
+	for (NumMapIter j = i->begin (); j != i->end (); ++j)
+	{
+	    cycle [0] = j->first;
+	    // and chain to the next digits
+	    if (find_cycle (cycle, 5, sat, maps, sets, preds))
+		goto out;
+	}
+    }
+    out:
+    // Since each number appears "high" once and "low" once, the answer is
+    // just the sum of the digits times 101.
+    std::cout << "Answer: " << (cycle [0] + cycle [1] + cycle [2] + cycle [3] +
+	                        cycle [4] + cycle [5]) * 101 << std::endl;
+    return 0;
+}
