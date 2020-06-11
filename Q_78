@@ -1,0 +1,48 @@
+#include <iostream>
+#include <cmath>
+
+/*
+ * P(n) = Sum((-1)**(k+1) * (P(n - k(3k - 1)/2) + P(n - k(3k + 1)/2)))
+ * where k = 1 ... n
+ */
+int PartitionPModulo (int n, int aiPn [], int modulo)
+{
+    if (n < 0)
+	return 0;
+    
+    if (aiPn [n] > 0)
+	return aiPn [n];
+    
+    int Pn = 0;
+    for (int k = 1; k <= sqrt (n); ++k)
+    {
+	int n1 = n - ((k * (3 * k - 1)) >> 1);
+	int n2 = n - ((k * (3 * k + 1)) >> 1);
+	
+	int Pn1 = PartitionPModulo (n1, aiPn, modulo);
+	int Pn2 = PartitionPModulo (n2, aiPn, modulo);
+	
+	if (k & 1)
+	    Pn += Pn1 + Pn2;
+	else
+	    Pn -= Pn1 + Pn2;
+	while (Pn < 0) Pn += modulo;
+	Pn %= modulo;
+    }
+    aiPn [n] = Pn;
+    return Pn;
+}
+
+int main ()
+{
+    int *aiPn, cnt;
+    int n = 1;
+    aiPn = new int [1000001];
+    aiPn [0] = 1;
+
+    while ((cnt = PartitionPModulo (n, aiPn, 1000000)))
+	++ n;
+    delete [] aiPn;
+    std::cout << "Answer: " << n << std::endl;
+    return 0;
+}
