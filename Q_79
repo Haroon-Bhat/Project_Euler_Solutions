@@ -1,0 +1,53 @@
+#include <iostream>
+#include <fstream>
+#include<bits/stdc++.h>
+
+using namespace std;
+
+int key[50];
+
+int digit[10], sol[10];
+
+int main()
+{
+	long long int a = 0, b, c = 0;
+
+	ifstream myfile;
+	myfile.open("keylog.txt");
+
+	while (!myfile.eof())
+	{
+		myfile >> key[a++];
+	}
+
+	for (a = 0;a < 10;a++)
+	{
+		digit[a] = 1;
+	}
+	for (b = 0;b < 50;b++) {
+		for (a = 0;a < 50;a++)
+		{
+			if (digit[key[a] / 100] < digit[(key[a] / 10) % 10] + 1)
+				digit[key[a] / 100] = digit[(key[a] / 10) % 10] + 1;
+
+			if (digit[(key[a] / 10) % 10] < digit[key[a] % 10] + 1)
+				digit[(key[a] / 10) % 10] = digit[key[a] % 10] + 1;
+
+			sol[key[a] / 100] = 1;
+			sol[(key[a] / 10) % 10] = 1;
+			sol[key[a] % 10] = 1;
+		}
+	}
+
+	b = 0;
+	for (a = 0;a < 10;a++)
+	{
+		b += a * pow(10, digit[a]-1)*sol[a];
+	}
+
+	cout << b;
+
+	cin.ignore();
+
+    return 0;
+}
