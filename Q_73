@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+int64_t *initialize_array(const int n) {
+    int64_t *result = (int64_t *) calloc(n + 1, sizeof(int64_t));
+    return result;
+}
+
+int64_t memoization_solution(const int n) {
+    const int one_half = 2;
+    const int one_third = 3;
+    int64_t *array = initialize_array(n);
+    for(int i = 2; i <= n; ++i) {
+        array[i] += i / one_half -  i / one_third;
+        if(array[i]) {
+            for(int j = 2 * i; j <= n; j += i) {
+                array[j] -= array[i];
+            }
+        }
+    }
+    int64_t *begin = array;
+    int64_t *end = array + n + 1;
+    int64_t result = 0;
+    while(begin != end) {
+        result += *begin;
+        ++begin;
+    }
+    free(array);
+    return result - 1;
+}
+
+int main(int argc, const char * argv[]) {
+    
+    const int limit = 12000;
+    printf("Memoization solution: %llu\n", memoization_solution(limit));
+    
+    return 0;
+}
