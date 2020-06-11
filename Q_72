@@ -1,0 +1,19 @@
+#include <iostream>
+#include <cstdio>
+using namespace std;
+const int MAX = 1000000;
+int tot[MAX+1];
+int main()
+{
+    for(int i=1;i<=MAX;i++)
+        tot[i]=i;
+    long long csum = 0;
+    for(int i=2;i<=MAX;i++)
+    {
+        if(i == tot[i])
+            for(int j=i;j<=MAX;j+=i)
+                tot[j]=tot[j]/i*(i-1);
+        csum += tot[i];
+    }
+    cout << csum << endl;
+}
