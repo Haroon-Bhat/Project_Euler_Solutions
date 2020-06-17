@@ -1,0 +1,20 @@
+#include <iostream>
+#include <cmath>
+
+bool is_square(int x){
+  int s=int(std::sqrt(x+.5));
+  return x==s*s;
+}
+
+int main(){
+  int count=0;
+  for(int A=1;;A++){
+    for(int S=2;S<=2*A;S++)
+      if(is_square(A*A+S*S))
+	count+=(S>A+1)?A+1-(S+1)/2:S/2;
+    if(count>=1000000){
+      std::cout << A << std::endl;
+      break;
+    }
+  }
+}
