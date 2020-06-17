@@ -1,0 +1,82 @@
+#include <stdio.h>
+
+const int FACES = 6;
+const int COMBINATION_COUNT = 210;
+int gCombinationList[COMBINATION_COUNT][FACES];
+const int SQUARES[9] = {1,4,9,16,25,36,49,64,81};
+
+unsigned long long combinations(int n, int k);
+bool isValidCombinationPair( int row1, int row2 );
+bool contains( int* arr, int len, int val );
+bool canRepresent( int squareNum, int row1, int row2 );
+
+int main(void)
+{
+	combinations(9,6);
+	int nValidArrangements = 0;
+	for ( int i=0; i<COMBINATION_COUNT; ++i )
+		for ( int j=i; j<COMBINATION_COUNT; ++j )
+			if ( isValidCombinationPair(i,j) )
+				++nValidArrangements;
+	printf("%d\n", nValidArrangements);
+	return 0;
+}
+
+unsigned long long combinations(int n, int k)
+{
+	int nCombinations = 0;
+	int arr[10];
+	int i;
+	for ( i = 0; i < k; ++i )
+		arr[i] = i;
+	while (true)
+	{
+		for (i = 0; i < k; i++)
+			gCombinationList[nCombinations][i] = arr[i];
+		++nCombinations;
+		i = k - 1;
+
+		while (arr[i] == (n - k + i + 1))
+			--i;
+
+		if (i < 0)
+			break;
+
+		++arr[i];
+		for (int j = i + 1; j < k; j++)
+			arr[j] = arr[i] + j - i;
+	}
+	return nCombinations;
+}
+
+bool isValidCombinationPair( int row1, int row2 )
+{
+	for ( int i = 0; i < 9; ++i )
+		if ( !canRepresent( SQUARES[i], row1, row2 ) )
+			return false;
+	return true;
+}
+
+bool contains( int* arr, int len, int val )
+{
+	for (int i=0; i < len; ++i)
+		if (arr[i] == val ||(arr[i]==6 && val==9) ||(arr[i]==9 && val==6))
+			return true;
+	return false;
+}
+
+bool canRepresent( int squareNum, int row1, int row2 )
+{
+	int digit1 = squareNum/10;
+	int digit2 = squareNum%10;
+
+	if ( contains(gCombinationList[row1], FACES, digit1) && 
+		 contains(gCombinationList[row2], FACES, digit2) ) 
+		return true;
+
+	if ( contains(gCombinationList[row1], FACES, digit2) && 
+		 contains(gCombinationList[row2], FACES, digit1) ) 
+		return true;
+
+	return false;
+}
