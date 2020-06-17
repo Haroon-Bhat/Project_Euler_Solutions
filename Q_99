@@ -1,0 +1,40 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include<bits/stdc++.h>
+using namespace std;
+std::vector<std::string> split(std::string str, char delimiter) {
+	std::vector<std::string> internal;
+	std::stringstream ss(str); 
+	std::string tok;
+	while (getline(ss, tok, delimiter)) {
+		internal.push_back(tok);
+	}
+	return internal;
+}
+int main() {
+	std::ifstream numbers_file("p082_matrix.txt");
+	int line_current = 1;
+	int biggest_number = 0;
+	int line_with_biggest_number = 1;
+	for (std::string line; std::getline(numbers_file, line); ) {	
+		std::vector<std::string> base_and_exponent = split(line, ',');
+
+		int base = std::stoi(base_and_exponent.at(0));
+		int exponent = std::stoi(base_and_exponent.at(1));
+
+		int n = exponent * log(base);
+
+		if (n > biggest_number) {
+			biggest_number = n;
+			line_with_biggest_number = line_current;
+		}
+		line_current++;
+	}
+	std::cout << "Biggest number is on line: " << line_with_biggest_number;
+	std::cin.get();
+	return 0;
+}
+ 
