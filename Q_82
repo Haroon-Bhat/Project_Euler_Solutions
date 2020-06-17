@@ -1,0 +1,102 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <list>
+#include <sstream>
+#include <algorithm>
+#include <chrono>
+
+using namespace std;
+
+struct node{
+  node* up;
+  node* down;
+  node* right;
+  unsigned int value;
+  unsigned int dist;
+};
+
+node* minWithin(list< node* >& v){
+  list< node* >::iterator u = v.begin();
+  for(list< node* >::iterator i = v.begin(); i != v.end(); ++i){
+    if((*i)->dist < (*u)->dist){
+      u = i;
+    }
+  }
+  node* p = *u;
+  v.erase(u);
+  return p;
+}
+
+vector< vector< node > > readFile(const string& filename){
+  ifstream infile(filename);
+  vector< string > vstr;
+  while(!infile.eof()){
+    string str;
+    infile >> str;
+    if(str.length() != 0){
+      str += ",0";
+      str.insert(0,"0,");
+      replace(str.begin(), str.end(), ',', ' ');
+      vstr.push_back(str);
+    }
+  }
+  infile.close();
+  vector< vector< node > > v;
+  for(auto&& i : vstr){
+    stringstream ss(i);
+    vector< node > vv;
+    while(!ss.eof()){
+      unsigned int n;
+      ss >> n;
+      node t;
+      t.value = n;
+      t.dist = 0-1;
+      vv.push_back(t);
+    }
+    v.push_back(vv);
+  }
+  for(vector< vector< node > >::iterator i = v.begin(); i != v.end(); ++i){
+    for(vector< node >::iterator j = i->begin(); j!=i->end(); ++j){
+      unsigned int c = j - i->begin();
+      j->up = i == v.begin() ? nullptr : &(i-1)->at(c);
+      j->down = i+1 == v.end() ? nullptr : &(i+1)->at(c);
+      j->right = j+1 == i->end() ? nullptr : &*(j+1);
+    }
+  }
+  return v;
+}
+
+unsigned int Dijkstra(vector< vector< node > >& map){
+  map.begin()->begin()->dist = 0;
+  list< node* > Q;
+  for(auto&& i : map){
+    for(auto&& j : i){
+      Q.push_back(&j);
+    }
+  }
+  node* ptr;
+  do{
+    ptr = minWithin(Q);
+    if(ptr->up)
+      ptr->up->dist = min(ptr->dist + ptr->up->value, ptr->up->dist);
+    if(ptr->down)
+      ptr->down->dist = min(ptr->dist + ptr->down->value, ptr->down->dist);
+    if(ptr->right)
+      ptr->right->dist = min(ptr->dist + ptr->right->value, ptr->right->dist);
+  }while(ptr != &*map.rbegin()->rbegin());
+
+  return ptr->dist;
+}
+
+int main(){
+  chrono::steady_clock::time_point ti = chrono::steady_clock::now();
+
+  vector< vector< node > > v = readFile("p082_matrix.txt");
+  unsigned int ans = Dijkstra(v);
+  cout << ans << endl;
+
+  chrono::steady_clock::time_point tf = chrono::steady_clock::now();
+  chrono::duration< double > t = chrono::duration_cast< chrono::duration< double > > (tf - ti);
+  cout << t.count() << "s" << endl;
+}
