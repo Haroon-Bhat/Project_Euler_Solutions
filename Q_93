@@ -1,0 +1,98 @@
+#include <iostream>
+#include <string.h>
+#include <set>
+#include <map>
+#include <cmath>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+#define REP(i,n) for(int (i)=0;(i)<(n);(i)++)
+#define REPD(i,n) for(int (i)=(n)-1;(i)>=0;(i)--)
+#define FOR(i,s,n) for(int (i)=(s);(i)<(n);(i)++)
+#define VI vector<int>
+#define VB vector<bool>
+#define PB push_back
+#define LL long long
+#define MAX 10000001
+double eps = 1e-7;
+int bestAt = 0;
+int best = 0;
+int digs[4];
+bool res[4000];
+bool opok;
+
+double op(double a,int i, double b) {
+	if(i==0)return a+b;
+	if(i==1)return a-b;
+	if(i==2)return a*b;
+	if(i==3) {
+		if(abs(b)>eps)return a/b;
+		else {
+			opok = false;
+			return 1;
+		}
+	}
+}
+
+int dfs() {
+	REP(p,5) REP(i,4) REP(j,4) REP(k,4) {
+		double a=digs[0];
+		double b=digs[1];
+		double c=digs[2];
+		double d=digs[3];
+		double t;
+		opok=true;
+		if(p==0) t = op(op(op(a,i,b),j,c),k,d);
+		else if(p==1) t = op(a,i,op(b,j,op(c,k,d)));
+		else if(p==2) t= op(op(a,i,b),j,op(c,k,d));
+		else if(p==3) t= op(op(a,i,op(b,j,c)),k,d);
+		else if(p==4) t= op(a,i,op(op(b,j,c),k,d));
+		
+		
+		if(opok && abs(t-round(t))<eps) {
+			int r = (int)round(t);
+			if(r>0)res[r]=true;
+		}
+		
+	}
+		
+}
+
+void gen(int id) {
+	if(id==4) {
+		int dis = digs[0]*1000+digs[1]*100+digs[2]*10+digs[3];
+		memset(res,false,sizeof(res));
+		do {
+			dfs();
+		} while(next_permutation(digs,digs+4));
+		int l=0;
+		for(int i=0;i<4000;i++) {
+			if(res[i]) {
+				l++;
+			}
+			else {
+				if(l>best) {
+					best = l;
+					bestAt = dis;
+				}
+				l=0;
+			}
+		}
+	}
+	else {
+		int l=0;
+		if(id>0)l=digs[id-1];
+		FOR(i,l+1,10) {
+			digs[id]=i;
+			gen(id+1);
+		}
+	
+	}
+}
+
+int main() {
+	gen(0);
+	printf("\nbest at %d - %d",bestAt,best);
+	return 0;
+}
