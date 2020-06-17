@@ -1,0 +1,109 @@
+#include <cstdlib>
+#include <vector>
+#include <iostream>
+
+enum 
+{
+	GO, A1, CC1, A2, T1, R1, B1, CH1, B2, B3,
+	JAIL, C1, U1, C2, C3, R2, D1, CC2, D2, D3,
+	FP, E1, CH2, E2, E3, R3, F1, F2, U2, F3,
+	G2J, G1, G2, CC3, G3, R4, CH3, H1, T2, H2
+};
+
+
+int main(int, char**)
+{
+	std::vector<size_t> fields(40, 0);
+
+	size_t currentPos = GO,
+	       currentCC = 0,
+	       currentCH = 0,
+	       newPos,
+	       dice1,
+	       dice2,
+	       numConseqDoubles = 0;
+
+	for (size_t i = 0; i < 10000; ++i)
+	{
+		dice1 = ((rand() % 4) + 1);
+		dice2 = ((rand() % 4) + 1);
+
+		if (dice1 == dice2)
+		{
+			if (3 == ++numConseqDoubles)
+			{
+				currentPos = JAIL;
+				++fields[JAIL];
+				numConseqDoubles = 0;
+				continue;
+			}
+		}
+		else
+		{
+			numConseqDoubles = 0;
+		}
+
+		newPos = ((currentPos + (dice1 + dice2)) % 40);
+		switch (newPos)
+		{
+		case G2J : currentPos = JAIL; numConseqDoubles = 0; break;
+		case CH1 :
+		case CH2 :
+		case CH3 :
+			switch (currentCH)
+			{
+			case 0 : currentPos = GO; break;
+			case 1 : currentPos = JAIL; break;
+			case 2 : currentPos = C1; break;
+			case 3 : currentPos = E3; break;
+			case 4 : currentPos = H2; break;
+			case 5 : currentPos = R1; break;
+			case 6 : 
+			case 7 :
+				if (CH1 == newPos) currentPos = R2;
+				if (CH2 == newPos) currentPos = R3;
+				if (CH3 == newPos) currentPos = R1;
+				break;
+			case 8 : currentPos = (CH2 == newPos) ? U2 : U1; break;
+			case 9 : currentPos = (newPos - 3); break;
+			default : currentPos = newPos; break;
+			}
+			currentCH = ((currentCH + 1) % 15);
+			if (currentPos != CC3) break;
+		case CC1 :
+		case CC2 :
+		case CC3 : 
+			switch (currentCC)
+			{
+			case 0  : currentPos = GO; break;
+			case 1  : currentPos = JAIL; break;
+			default : currentPos = newPos;
+			}
+			currentCC = ((currentCC + 1) % 15);
+			break;
+		default : currentPos = newPos;
+		}
+		
+		++fields[currentPos];
+	}
+
+	std::cout << "solution: ";
+	for (int i = 0; i < 3; ++i)
+	{
+		size_t maxV = 0, maxN;
+		for (size_t n = 0; n < 40; ++n)
+		{
+			if (fields[n] > maxV)
+			{
+				maxV = fields[n];
+				maxN = n;
+			}
+		}
+		std::cout << maxN;
+		fields[maxN] = 0;
+	}
+	std::cout << "\n";
+	system("pause");
+
+	return 0;
+}
