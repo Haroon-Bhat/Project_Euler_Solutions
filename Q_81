@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <limits.h>
+
+int minimal_path_sum (int matrix [80][80], int path_sums [80][80], int y, int x)
+{
+    int sum_right, sum_down;
+    if (path_sums [y][x])
+	return path_sums [y][x];
+    
+    if (x < 79)
+	sum_right = minimal_path_sum (matrix, path_sums, y, x + 1);
+    else
+	sum_right = INT_MAX;
+    
+    if (y < 79)
+	sum_down = minimal_path_sum (matrix, path_sums, y + 1, x);
+    else
+	sum_down = INT_MAX;
+    
+    if (sum_right < sum_down)
+	path_sums [y][x] = matrix [y][x] + sum_right;
+    else
+	path_sums [y][x] = matrix [y][x] + sum_down;
+    return path_sums [y][x];
+}
+    
+int main ()
+{
+    int matrix [80][80], sums [80][80];
+    FILE *fp = fopen ("p081_matrix.txt", "r");
+    if (!fp)
+    {
+	perror ("open");
+	exit (1);
+    }
+    
+    for (int i = 0; i < 80; ++i)
+	for (int j = 0; j < 80; ++j)
+	{
+	    char ch;
+	    while (!isdigit (ch = fgetc (fp)));
+	    matrix [i][j] = ch - '0';
+	    while (isdigit (ch = fgetc (fp)))
+	    {
+		matrix [i][j] *= 10;
+		matrix [i][j] += ch - '0';
+	    }
+	}
+    
+    fclose (fp);
+    
+    memset (sums, 0, sizeof (sums));
+    sums [79][79] = matrix [79][79];
+    printf ("Answer: %d\n", minimal_path_sum (matrix, sums, 0, 0));
+    return 0;
+}
