@@ -1,0 +1,11 @@
+#include<stdio.h>
+#include<math.h>
+long double i,j,sum;
+int main(){
+  j=pow10(10);
+  for(i=1,sum=2;i<7830457;i++) sum=fmod(2*sum,j);
+  sum=fmod(sum*28433+1,j);
+  printf("%.0Lf\n",sum);
+  
+    return 0;
+}
