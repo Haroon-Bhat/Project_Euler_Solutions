@@ -1,0 +1,109 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <chrono>
+
+using namespace std;
+
+struct grid{
+  vector< vector< unsigned int > > sq;
+  grid(){
+    sq = vector< vector< unsigned int > >(9,vector< unsigned int >(9,0));
+  }
+};
+
+vector< grid > readFile(const string& filename){
+  ifstream infile(filename);
+  vector< grid > v(50);
+  string str;
+  for(auto&& i : v){
+    getline(infile,str);
+    for(auto&& j : i.sq){
+      for(auto&& k : j){
+        char c;
+        infile >> c;
+        k = c - '0';
+      }
+      getline(infile,str);
+    }
+  }
+  infile.close();
+  return v;
+}
+
+unsigned int puzzleSum(const vector< grid >& v){
+  unsigned int sum = 0;
+  for(auto&& i : v){
+    sum += (i.sq[0][0]*100) + (i.sq[0][1]*10) + (i.sq[0][2]);
+  }
+  return sum;
+}
+
+bool valid(const grid& p, const unsigned int& row, const unsigned int& col){
+  for(unsigned int i = 0; i < 9; ++i){
+    if(i != row){
+      if(p.sq[i][col] == p.sq[row][col]){
+        return false;
+      }
+    }
+    if(i != col){
+      if(p.sq[row][i] == p.sq[row][col]){
+        return false;
+      }
+    }
+  }
+  for(unsigned int i = (row/3)*3; i < (row/3)*3+3; ++i){
+    for(unsigned int j = (col/3)*3; j < (col/3)*3+3; ++j){
+      if(!(row == i && col == j)){
+        if(p.sq[i][j] == p.sq[row][col]){
+          return false;
+        }
+      }
+    }
+  }
+}
+
+bool solve(grid& p){
+  unsigned int* it = nullptr;
+  unsigned int i;
+  unsigned int j;
+  for(i = 0; it == nullptr && i < 9;){
+    for(j = 0; it == nullptr && j < 9;){
+      if(p.sq[i][j] == 0)
+        it = &p.sq[i][j];
+      if(it == nullptr)
+        ++j;
+    }
+    if(it == nullptr)
+      ++i;
+  }
+  if(it == nullptr)
+    return true;
+  for(unsigned int k = 1; k < 10; ++k){
+    *it = k;
+    if(valid(p,i,j)){
+      if(solve(p)){
+        return true;
+      }
+    }
+  }
+  *it = 0;
+  return false;
+}
+
+int main(){
+  chrono::steady_clock::time_point ti = chrono::steady_clock::now();
+
+  vector< grid > puzzles(readFile("p082_matrix.txt"));
+  unsigned int count = 0;
+  for(auto&& i : puzzles){
+    solve(i);
+    cout << "solved " << ++count << endl;
+  }
+  cout << puzzleSum(puzzles) << endl;
+
+  chrono::steady_clock::time_point tf = chrono::steady_clock::now();
+  chrono::duration< double >t = chrono::duration_cast< chrono::duration< double > > (tf - ti);
+  cout << t.count() << "s" << endl;
+}
