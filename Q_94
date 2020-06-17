@@ -1,0 +1,39 @@
+#include <iostream>
+#include <cmath>
+using std::cout;
+using std::endl;
+
+typedef long long int lint;
+
+lint sqrt(lint n)
+{
+	lint r1=n;
+	lint r2=n/2;
+	if (r2==0)
+		r2=1;
+	while(r1-r2>0)
+	{
+		r1 = r2;
+		r2=(r1+n/r1)/2;
+	}
+	return r1;
+}
+
+const double COEF = 2.0+sqrt(3.0);
+
+int main()
+{
+	lint a1=0,s=0;
+	int addi=-1;
+	for(lint a=10; a<1000000000/3; a-=2*addi)
+	{
+		a1 = (a/2+addi)*(3*a/2+addi);
+		if (sqrt(a1)*sqrt(a1) == a1)
+		{
+			s += 3*a-2;
+			a = int(double(a)*COEF)+(addi+1)/2;
+			addi = -addi;
+		}
+	}
+	cout << s << endl;
+}
