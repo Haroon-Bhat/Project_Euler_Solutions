@@ -1,0 +1,148 @@
+/* Problem 98:  Square Anagrams.  */
+
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <cstdlib>
+#include <cmath>
+#include <cassert>
+#include <cstring>
+#include <stdint.h>
+
+const char* WORDS[] = {
+# include "p082_matrix.txt"
+  };
+const unsigned WORDS_CNT = sizeof (WORDS) / sizeof (WORDS[0]);
+
+typedef uint64_t numT;
+typedef double floatT;
+
+inline bool isSquare (numT n)
+{
+  const floatT root (std::sqrt (static_cast<floatT> (n)));
+  const numT intRoot (std::floor (root));
+  return intRoot * intRoot == n;
+}
+
+inline bool cmpStrlen (const char* s1, const char* s2)
+{
+  return std::strlen (s1) < std::strlen (s2);
+}
+
+bool isAnagram (std::string s1, std::string s2)
+{
+  std::sort (s1.begin (), s1.end ());
+  std::sort (s2.begin (), s2.end ());
+  return s1 == s2;
+}
+
+numT checkPairRecurse (const std::string& s1, const std::string& s2,
+                       int* digits, bool* hasDig)
+{
+  assert (s1.size () == s2.size ());
+
+  numT num1(0), num2(0);
+  int nextDigit (-1);
+  for (unsigned i (0); i != s1.size (); ++i)
+    {
+      num1 *= 10;
+      num2 *= 10;
+
+      const unsigned dig1 (s1[i] - 'A');
+      const unsigned dig2 (s2[i] - 'A');
+
+      if (digits[dig1] == -1)
+        {
+          nextDigit = dig1;
+          break;
+        }
+      if (digits[dig2] == -1)
+        {
+          nextDigit = dig2;
+          break;
+        }
+
+      if (i == 0 && (digits[dig1] == 0 || digits[dig2] == 0))
+        return 0;
+
+      num1 += digits[dig1];
+      num2 += digits[dig2];
+    }
+
+  if (nextDigit == -1)
+    {
+      if (!isSquare (num1) || !isSquare (num2))
+        return 0;
+
+      return std::max (num1, num2);
+    }
+
+  numT res (0);
+  for (unsigned i (0); i != 10; ++i)
+    {
+      if (hasDig[i])
+        continue;
+
+      hasDig[i] = true;
+      digits[nextDigit] = i;
+
+      const numT curRes (checkPairRecurse (s1, s2, digits, hasDig));
+      if (curRes > res)
+        res = curRes;
+
+      digits[nextDigit] = -1;
+      hasDig[i] = false;
+    }
+
+  return res;
+}
+
+numT checkPair (const std::string& s1, const std::string& s2)
+{
+  int digits[26];
+  bool hasDig[10];
+  std::fill (digits, digits + 26, -1);
+  std::fill (hasDig, hasDig + 10, false);
+  return checkPairRecurse (s1, s2, digits, hasDig);
+}
+
+int main ()
+{
+  assert (isSquare (123456789ULL * 123456789ULL));
+  assert (!isSquare (123456789ULL * 123456788ULL));
+  assert (isAnagram ("CARE", "RACE"));
+  assert (!isAnagram ("ABC", "ABCD"));
+
+  /* Sort array of words by their string-length.  */
+  std::sort (WORDS, WORDS + WORDS_CNT, cmpStrlen);
+
+  /* Walk the array.  For each word, check all words of the same length; if an
+     anagram is found, try to find a digit-set to make squares.  */
+  unsigned lenbegin (0);
+  numT maxSquare (0);
+  for (unsigned i (0); i != WORDS_CNT; ++i)
+    {
+      assert (std::strlen (WORDS[lenbegin]) <= std::strlen (WORDS[i]));
+      if (std::strlen (WORDS[i]) > std::strlen (WORDS[lenbegin]))
+        lenbegin = i;
+
+      for (unsigned j (lenbegin); j != WORDS_CNT; ++j)
+        {
+          if (i == j)
+            continue;
+          if (std::strlen (WORDS[j]) != std::strlen (WORDS[lenbegin]))
+            break;
+
+          if (isAnagram (WORDS[i], WORDS[j]))
+            {
+              const numT curSquare (checkPair (WORDS[i], WORDS[j]));
+              if (curSquare > maxSquare)
+                maxSquare = curSquare;
+            }
+        }
+    }
+
+  std::cout << maxSquare << std::endl;
+
+  return EXIT_SUCCESS;
+}
