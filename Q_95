@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+#define	true				1
+#define false				0
+
+#define LIMIT				1000000
+
+typedef long unsigned int	number;
+
+number array[LIMIT+1] = { 0 };
+
+number spd(number n)
+{
+	number d, sum=1, root=(number)floor(sqrt(n));
+	if (n==1) return 0;
+	for (d=2; d<=root; d++)
+		if (n%d == 0)
+				sum+=d+n/d;
+
+	if (root*root==n)
+		sum-=root;
+
+	return sum;
+}
+
+#define CHAIN_LEN	1000
+number chain[CHAIN_LEN];
+number chain_len=0;
+
+number walk_chain(number limit, number n, number *smallest)
+{
+	number c,len=0,minimum=n;
+	register number i;
+	memset(chain,0,sizeof(number)*CHAIN_LEN);
+	chain_len=0;
+	c=array[n];
+	
+	while (c <= limit)
+	{
+		if (c == n) break;
+
+		for (i=0; i<chain_len;i++)
+			if (c==chain[i])
+				return 0;
+		if (chain_len >= CHAIN_LEN)
+			printf("Exceeding max chain length.\n");
+		else
+			chain[chain_len++]=c;
+		len++;
+		if (c<minimum) minimum=c;
+		c=array[c];
+	}
+
+	*smallest=minimum;
+	return c == n ? len: 0;
+}
+
+int main(int argc, char *argv[])
+{
+	number n,smallest,limit=LIMIT;
+	number len, max=0, fn;
+	for (n=1; n<= limit; n++)
+		array[n]=spd(n);
+
+	for (n=1; n <= limit; n++)
+	{
+		len=walk_chain(limit,n,&smallest);
+		if (len>max)
+		{
+			max=len;
+			fn=smallest;
+		}
+	}
+
+	printf("The smallest member of the longest amicable chain with no element exceeding %lu is %lu.\n", limit, fn);
+	return 0;
+}
