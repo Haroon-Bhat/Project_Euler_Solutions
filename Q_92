@@ -1,0 +1,50 @@
+#include <set>
+#include <iostream>
+
+using namespace std;
+
+#define TENMIL 10000000
+
+bool chain(unsigned int num)
+{
+    unsigned int k;
+    short dig;
+    unsigned int sum = 0, temp;
+    char numstr[8];
+    
+    if (num == 89) return true;
+    temp = num;
+
+    while (1)
+    {
+        snprintf(numstr, 8, "%d", temp);
+        for (k = 0; numstr[k] != '\0';)
+        {
+            dig = numstr[k] - '0';
+            sum += dig * dig;
+            k++;
+        }
+        
+        if (sum == 89) return true;
+        else if (sum == 1) return false;
+        temp = sum;
+        sum = 0;
+    }
+    
+    return false;
+}
+
+int main(void)
+{
+    int count = 0;
+    unsigned int n;
+    
+    for (n = 2; n < TENMIL; n++)
+    {
+        if (chain(n))
+            count++;
+    }
+    printf("%d\n", count);
+
+    return 0;
+}
